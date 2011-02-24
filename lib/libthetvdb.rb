@@ -15,10 +15,10 @@
     You should have received a copy of the GNU General Public License
     along with libthetvdb.  If not, see <http://www.gnu.org/licenses/>.
 =end
-autoload :XmlSimple, 'xmlsimple'
-autoload :WWW, 'mechanize'
+require 'xmlsimple'
+require 'mechanize'
 autoload :ERB, 'erb'   #Used for url encoding
-autoload :Memoizable, 'memoizable/lib/memoizable.rb'
+require 'memoizable/lib/memoizable.rb'
 
 module Thetvdb
 
@@ -39,7 +39,7 @@ module Thetvdb
     end
 
 		def agent(timeout=300)
-			a = WWW::Mechanize.new
+			a = Mechanize.new
 			a.read_timeout = timeout if timeout
 			a.user_agent_alias= 'Mac Safari'
 			a   
@@ -136,9 +136,6 @@ module Thetvdb
         return []
       end
     end
-    include Memoizable
-    memoize :search
-    memoize :getAllEpisodes
   end
 end
 
