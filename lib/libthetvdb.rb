@@ -22,8 +22,8 @@ autoload :ERB, 'erb'   #Used for url encoding
 module Thetvdb
 
   class << self
-    #readFile takes a filename, and optionally the maximum number of lines to read.
-    #
+
+    #readFile takes a filename, and optionally the maximum num of lines to read
     #returns the lines read as an array.
     def readFile file, max_lines=0
       counter=0
@@ -37,14 +37,13 @@ module Thetvdb
       read_lines
     end
 
-		def agent(timeout=300)
-			a = Mechanize.new
-			a.read_timeout = timeout if timeout
-			a.user_agent_alias= 'Mac Safari'
-			a   
-		end
+    def agent(timeout=300)
+       a = Mechanize.new
+       a.read_timeout = timeout if timeout
+       a.user_agent_alias= 'Mac Safari'
+       a   
+    end
 
-    #
     def initMirror
       mirrors_xml = XmlSimple.xml_in agent.get("http://www.thetvdb.com/api/#{@apikey}/mirrors.xml").body
       mirrors_xml['Mirror'][0]['mirrorpath'][0]
@@ -95,7 +94,7 @@ module Thetvdb
 			regex=/<a href="[^"]*" class="seasonlink">All<\/a>/
 			
 			episodeList=[]
-			#TheTVDB runs slow on weekends soemtimes, dont want to crash fail, retry instead
+			#TheTVDB runs slow on weekends sometimes, dont want to crash fail, retry instead
 			body= XmlSimple.xml_in( agent.get("http://thetvdb.com/api/#{@apikey}/series/#{seriesID}/all/en.xml").body )
 
 			if body.has_key?('Episode')!=TRUE
@@ -106,14 +105,23 @@ module Thetvdb
 
 			body['Episode'].each {|episode|
 				episode['EpisodeName'][0]='' if episode['EpisodeName'][0].class==Hash
-				episodeList << { 
-					'EpisodeName' => episode['EpisodeName'][0], 
-					'EpisodeNumber' => episode['EpisodeNumber'][0],
-					'Season' => episode['SeasonNumber'][0],
-					'SeriesID' => body['Series'][0]['id'][0],
-					'EpisodeID' => 'S' << episode['SeasonNumber'][0] \
-						<< 'E' << episode['EpisodeNumber'][0]
-				}
+##########################
+
+            #episode has more info if we want it, but this seems good
+            episodeList << {
+                    :SeasonNumber => episode['SeasonNumber'][0],
+                    :seasonid => episode['seasonid'][0],
+
+                    :EpisodeNumber => episode['EpisodeNumber'][0],
+                    :EpisodeName => episode['EpisodeName'][0],
+
+                    :FirstAired => episode['FirstAired'][0],
+                    :Overview => episode['Overview'][0],
+
+                    :filename => episode['filename'][0],
+                    :IMDB_ID => episode['IMDB_ID'][0],
+            }
+
 			}
 			return episodeList
 		end
