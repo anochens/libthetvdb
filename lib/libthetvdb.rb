@@ -104,7 +104,12 @@ module Thetvdb
 			end
 
 			body['Episode'].each {|episode|
-				episode['EpisodeName'][0]='' if episode['EpisodeName'][0].class==Hash
+				episode['EpisodeName'][0]='' if episode['EpisodeName'][0] == {}
+
+            #skip episodes without names
+            next if episode['EpisodeName'][0] == ''
+
+
 ##########################
 
             #episode has more info if we want it, but this seems good
@@ -121,9 +126,8 @@ module Thetvdb
                     :filename => episode['filename'][0],
                     :IMDB_ID => episode['IMDB_ID'][0],
             }
-
 			}
-			return episodeList
+			return episodeList 
 		end
 
     #Search Thetvdb.com for str
