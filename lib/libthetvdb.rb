@@ -18,7 +18,6 @@
 require 'xmlsimple'
 require 'mechanize'
 autoload :ERB, 'erb'   #Used for url encoding
-require 'memoizable/lib/memoizable.rb'
 
 module Thetvdb
 
