@@ -17,6 +17,7 @@
 =end
 require 'xmlsimple'
 require 'mechanize'
+require 'chronic'
 autoload :ERB, 'erb'   #Used for url encoding
 
 module Thetvdb
@@ -84,21 +85,20 @@ module Thetvdb
 			results.each_index {|i|
 				results[i]['EpisodeList']= getAllEpisodes(results[i]['tvdbSeriesID'])
 			}
-			return results
+
+			results
 		end
 
-		def getAllEpisodes( seriesID )
+		def getAllEpisodes( seriesID, since = nil )
 			raise "getAllEpisodes() only takes seriesID" if seriesID.class==Fixnum
+         start if mirror.nil?
+
 			episodeList=[]
 
-			regex=/<a href="[^"]*" class="seasonlink">All<\/a>/
-			
-			episodeList=[]
-			#TheTVDB runs slow on weekends sometimes, dont want to crash fail, retry instead
-			body= XmlSimple.xml_in( agent.get("http://thetvdb.com/api/#{@apikey}/series/#{seriesID}/all/en.xml").body )
+			#TheTVDB runs slowly sometimes, dont want to crash fail, retry instead
+			body = XmlSimple.xml_in( agent.get("http://thetvdb.com/api/#{@apikey}/series/#{seriesID}/all/en.xml").body )
 
-			if body.has_key?('Episode')!=TRUE
-				#has no episodeS?
+			unless body.has_key?('Episode')
 				puts "#{seriesID} has no episodes?"
 				return []
 			end
@@ -109,25 +109,32 @@ module Thetvdb
             #skip episodes without names
             next if episode['EpisodeName'][0] == ''
 
+            sincedate = Chronic.parse(since)
+            airdate   = Chronic.parse(episode['FirstAired'][0])    
 
-##########################
+            # sincedate.nil?  means no date was passed, so show all
+            # airdate.nil? means a really new episode with no air adte
+            # since < air means it is in the target range 
+            if sincedate.nil? || airdate.nil? ||  sincedate <= airdate 
 
-            #episode has more info if we want it, but this seems good
-            episodeList << {
-                    :SeasonNumber => episode['SeasonNumber'][0],
-                    :seasonid => episode['seasonid'][0],
+               #episode has more info if we want it, but this seems good
+               episodeList << {
+                       :SeasonNumber => episode['SeasonNumber'][0],
+                       :seasonid => episode['seasonid'][0],
 
-                    :EpisodeNumber => episode['EpisodeNumber'][0],
-                    :EpisodeName => episode['EpisodeName'][0],
+                       :EpisodeNumber => episode['EpisodeNumber'][0],
+                       :EpisodeName => episode['EpisodeName'][0],
 
-                    :FirstAired => episode['FirstAired'][0],
-                    :Overview => episode['Overview'][0],
+                       :FirstAired => episode['FirstAired'][0],
+                       :Overview => episode['Overview'][0],
 
-                    :filename => episode['filename'][0],
-                    :IMDB_ID => episode['IMDB_ID'][0],
-            }
+                       :filename => episode['filename'][0],
+                       :IMDB_ID => episode['IMDB_ID'][0],
+               }
+            end
 			}
-			return episodeList 
+
+			episodeList 
 		end
 
     #Search Thetvdb.com for str
