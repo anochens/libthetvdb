@@ -111,25 +111,26 @@ module Thetvdb
 
             sincedate = Chronic.parse(since)
             airdate   = Chronic.parse(episode['FirstAired'][0])    
+            next if airdate.nil?
 
             # sincedate.nil?  means no date was passed, so show all
             # airdate.nil? means a really new episode with no air adte
             # since < air means it is in the target range 
-            if sincedate.nil? || airdate.nil? ||  sincedate <= airdate 
+            if sincedate.nil? ||  sincedate <= airdate 
 
                #episode has more info if we want it, but this seems good
                episodeList << {
                        :SeasonNumber => episode['SeasonNumber'][0],
-                       :seasonid => episode['seasonid'][0],
+#                      :SeasonID => episode['seasonid'][0],
 
-                       :EpisodeNumber => episode['EpisodeNumber'][0],
-                       :EpisodeName => episode['EpisodeName'][0],
+                       "episode_number" => episode['EpisodeNumber'][0],
+                       "name" => episode['EpisodeName'][0],
 
-                       :FirstAired => episode['FirstAired'][0],
-                       :Overview => episode['Overview'][0],
+                       "air_date" => episode['FirstAired'][0],
+                       "description" => episode['Overview'][0],
 
-                       :filename => episode['filename'][0],
-                       :IMDB_ID => episode['IMDB_ID'][0],
+                       "image_location" => episode['filename'][0],
+                       "imdb_id" => episode['IMDB_ID'][0],
                }
             end
 			}
