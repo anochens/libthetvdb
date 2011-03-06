@@ -16,6 +16,7 @@
     along with libthetvdb.  If not, see <http://www.gnu.org/licenses/>.
 =end
 
+require 'rubygems'
 require 'mechanize'
 require 'xmlsimple'
 require 'erb'
