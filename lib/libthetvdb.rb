@@ -71,7 +71,7 @@ module Thetvdb
       @mirror=initMirror
     end
     attr_accessor :apikey
-    attr_reader :apikey, :mirror
+    attr_reader :mirror
 
 		#Format results from TVDB
 		#return a hash with the parts we store in the database.
