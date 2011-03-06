@@ -1,5 +1,8 @@
 = libthetvdb
 
+To set the api key:
+Thetvdb.apikey = "XXXXX"
+
 This is the libthetvdb library.  It provides
 a ruby interface to the TheTvdb.com API.
 http://thetvdb.com/
