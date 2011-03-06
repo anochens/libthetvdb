@@ -15,8 +15,8 @@ Jeweler::Tasks.new do |gem|
   gem.name = "libthetvdb"
   gem.homepage = "http://github.com/cmu-is-projects/libthetvdb"
   gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
+  gem.summary = "Gem to access libthetvdb"
+  gem.description = "This gem is used to access libthetvdb"
   gem.email = "anochens@andrew.cmu.edu"
   gem.authors = ["Alan"]
   # Include your dependencies below. Runtime dependencies are required when using your gem,
