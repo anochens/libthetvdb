@@ -15,10 +15,11 @@
     You should have received a copy of the GNU General Public License
     along with libthetvdb.  If not, see <http://www.gnu.org/licenses/>.
 =end
-require 'xmlsimple'
+
 require 'mechanize'
-require 'chronic'
-autoload :ERB, 'erb'   #Used for url encoding
+require 'xmlsimple'
+require 'erb'
+
 
 module Thetvdb
 
