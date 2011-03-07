@@ -19,7 +19,6 @@ Jeweler::Tasks.new do |gem|
   gem.description = "This gem is used to access libthetvdb"
   gem.email = "anochens@andrew.cmu.edu"
   gem.authors = ["Alan"]
-  gem.files = FileList['lib/**/*.rb', 'bin/*', '[A-Z]*', 'test/**/*','*'].to_a
 
   # Include your dependencies below. Runtime dependencies are required when using your gem,
   # and development dependencies are only needed for development (ie running rake tasks, tests, etc)

@@ -165,7 +165,7 @@ module Thetvdb
 		start if mirror.nil?
 
       #read from the local file to save server loads
-		ids = IO.readlines( "lib/updates_all.txt" ).map{|l| l.gsub("\n","") }
+		ids = IO.readlines( File.dirname(__FILE__) + "/updates_all.txt" ).map{|l| l.gsub("\n","") }
 
 		return ids
     end
