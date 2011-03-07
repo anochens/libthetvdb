@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{libthetvdb}
-  s.version = "0.4.1"
+  s.version = "0.4.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Alan"]
@@ -17,21 +17,12 @@ Gem::Specification.new do |s|
     "README.rdoc"
   ]
   s.files = [
-    ".gitmodules",
-    "COPYING",
-    "Gemfile",
     "Gemfile.lock",
-    "HEADER",
     "LICENSE.txt",
     "README.rdoc",
-    "Rakefile",
-    "VERSION",
-    "lib/libthetvdb.rb",
-    "lib/updates_all.txt",
+    "apikey.txt",
     "libthetvdb.gemspec",
-    "test.rb",
-    "test/helper.rb",
-    "test/test_libthetvdb.rb"
+    "test.rb"
   ]
   s.homepage = %q{http://github.com/cmu-is-projects/libthetvdb}
   s.licenses = ["MIT"]
