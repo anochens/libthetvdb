@@ -160,6 +160,32 @@ module Thetvdb
         return []
       end
     end
+
+    def getAllSeriesIds
+		start if mirror.nil?
+
+      #read from the local file to save server loads
+		ids = IO.readlines( "updates_all.txt" ).map{|l| l.gsub("\n","") }
+
+		return ids
+    end
+
+	 def infoForSeriesId(seriesID)
+	   start if mirror.nil?
+
+    	p "http://thetvdb.com/api/#{@apikey}/series/#{seriesID}/en.xml\n\n\n\n"
+
+		begin 
+			body = XmlSimple.xml_in( agent.get("http://thetvdb.com/api/#{@apikey}/series/#{seriesID}/en.xml").body )
+
+			body = body["Series"][0]
+			body.each{|k,v| body[k] = v[0]}
+
+		rescue Mechanize::ResponseCodeError
+         body = nil
+		end
+		body
+	 end
   end
 end
 
