@@ -63,7 +63,7 @@ module Thetvdb
              readFile(File.dirname(__FILE__)+'/../apikey.txt').first.strip
          rescue Errno::ENOENT => e
            if e.to_s[/No such file.+apikey\.txt/]
-             puts "Egads!  You need to go get an API key from Thetvdb.com and place it in apikey.txt in the libthetvdb/ or libthetvdb/lib/ directory.\nhttp://thetvdb.com/?tab=register\n"
+             puts "Get an apikey please"
              raise e
            end
          end
@@ -125,8 +125,8 @@ module Thetvdb
 
                #episode has more info if we want it, but this seems good
                episodeList << {
-                       :SeasonNumber => episode['SeasonNumber'][0],
-#                      :SeasonID => episode['seasonid'][0],
+                       "SeasonNumber" => episode['SeasonNumber'][0],
+                       "SeasonID" => episode['seasonid'][0],
 
                        "episode_number" => episode['EpisodeNumber'][0],
                        "name" => episode['EpisodeName'][0],
@@ -172,8 +172,6 @@ module Thetvdb
 
 	 def infoForSeriesId(seriesID)
 	   start if mirror.nil?
-
-    	p "http://thetvdb.com/api/#{@apikey}/series/#{seriesID}/en.xml\n\n\n\n"
 
 		begin 
 			body = XmlSimple.xml_in( agent.get("http://thetvdb.com/api/#{@apikey}/series/#{seriesID}/en.xml").body )
