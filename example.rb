@@ -9,16 +9,16 @@ Thetvdb.apikey=`cat ./apikey.txt`.chomp
 #get series info and all episode info
 #same result as infoForSeriesId() followed by getAllEpisodes()
 #use this instead, because it is more efficient
-pp Thetvdb.getFullSeriesRecord("75760")
+#pp Thetvdb.getFullSeriesRecord("75760")
 
 #get all episodes for a given series, by id
-pp Thetvdb.getAllEpisodes("75760")
+#pp Thetvdb.getAllEpisodes("75760")
 
 #get all of the series id's as an array
-pp Thetvdb.getAllSeriesIds()
+#pp Thetvdb.getAllSeriesIds()
 
 #search the db for shows by name, multiple things returned
-pp Thetvdb.search("scrubs")
+#pp Thetvdb.search("scrubs")
 
 #gets just series information for a given show
 pp Thetvdb.infoForSeriesId("75760")

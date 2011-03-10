@@ -38,10 +38,19 @@ module Thetvdb
 		def formatInside( inside )
 			inside = inside[0] if inside.is_a?(Array) && inside.length==1
 			inside.each{|k,v|
+				# get rid of the common ["something here"], where array unneeded
 				v = v[0] if v.is_a?(Array) && v.length==1
+
+				#turn lists with seperators into arrays
     			v = v.split("|") if v.is_a?(String) && v.count("|") > 1
+
+				#get rid of empty elements from the array
 				v.delete("") if v.is_a?(Array)
+
+				#replace {}s with nils; it's more intuitive to test for nil
 				v = nil if v == {}
+
+				#set the inside to the changed version
          	inside[k] = v
 			}
 			inside
@@ -63,47 +72,15 @@ module Thetvdb
 				return []
 			end
 
-			body['Episode'].each {|episode|
-				episode['EpisodeName'][0]='' if episode['EpisodeName'][0] == {}
-
-            #skip episodes without names
-            next if episode['EpisodeName'][0] == ''
-
-				#episode has more info if we want it, but this seems good
-				episodeList << {
-						  "SeasonNumber" => episode['SeasonNumber'][0],
-						  "SeasonID" => episode['seasonid'][0],
-
-						  "episode_number" => episode['EpisodeNumber'][0],
-						  "name" => episode['EpisodeName'][0],
-
-						  "air_date" => episode['FirstAired'][0],
-						  "description" => episode['Overview'][0],
-
-						  "image_location" => episode['filename'][0],
-						  "imdb_id" => episode['IMDB_ID'][0],
-				}
-			}
-
-			episodeList 
+			body['Episode'].map! {|episode| formatInside(episode) }
+			body['Episode'] 
 		end
 
     #Search Thetvdb.com for str
-    def search str, retries=2
-		begin
-			str = ERB::Util.url_encode str 
-			url="http://thetvdb.com/api/GetSeries.php?seriesname=#{str}"
-			xml_get(url)
-		rescue Errno::ETIMEDOUT => e
-			(retries-=1 and retry) unless retries<=0
-			raise e
-		rescue Timeout::Error => e
-			(retries-=1 and retry) unless retries<=0
-			raise e
-		rescue REXML::ParseException => e
-			#return empty and continue normally, response from Thetvdb is malformed.
-			return []
-		end
+    def search(str)
+		str = ERB::Util.url_encode str 
+		url="http://thetvdb.com/api/GetSeries.php?seriesname=#{str}"
+		xml_get(url)
     end
 
 	 #this is pretty hacky for now, will fix eventually
@@ -119,30 +96,35 @@ module Thetvdb
 		full_record = xml_get(url)
 		
       full_record["Series"] = formatInside(full_record["Series"]) 
-
-      full_record["Episode"].each{|episode|
-			episode = formatInside(episode)
-		}
-
+      full_record["Episode"].map!{|episode| formatInside(episode) }
+			
 		full_record
 	 end        
 
 	 def infoForSeriesId(seriesID)
 		url = "http://thetvdb.com/api/#{@apikey}/series/#{seriesID}/en.xml"
-		body = xml_get(url)
-		body = body["Series"][0]
-		body.each{|k,v| body[k] = v[0]}
-
-		body
+		series = xml_get(url)
+		series = formatInside(series["Series"])
+		
+		series
 	 end
 
-	 def xml_get(url)
+	 def xml_get(url, retries = 3)
 		begin
 			body = XmlSimple.xml_in( agent.get(url).body )
 		rescue Mechanize::ResponseCodeError
          body = nil
 			raise
-      end
+		rescue Errno::ETIMEDOUT => e
+			(retries-=1 and retry) if retries > 0
+			raise e
+		rescue Timeout::Error => e
+			(retries-=1 and retry) if retries > 0
+			raise e
+		rescue REXML::ParseException => e
+			#return empty and continue normally, response from Thetvdb is malformed.
+			return []
+		end    
       body
 	 end
   end
