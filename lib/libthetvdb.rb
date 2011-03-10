@@ -98,7 +98,7 @@ module Thetvdb
 		
       full_record["Series"] = formatInside(full_record["Series"]) 
 
-		fill_record["Episode"] ||= [] #deal with having no episodes
+		full_record["Episode"] ||= [] #deal with having no episodes
       full_record["Episode"].map!{|episode| formatInside(episode) }
 			
 		full_record
