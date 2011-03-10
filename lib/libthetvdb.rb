@@ -23,36 +23,28 @@ require 'erb'
 
 module Thetvdb
 
-  class << self
+	class << self
 
-    def agent(timeout=300)
-       a = Mechanize.new
-       a.read_timeout = timeout if timeout
-       a.user_agent_alias= 'Mac Safari'
-       a   
-    end
+		attr_accessor :apikey
 
-    attr_accessor :apikey
+		def agent(timeout=300)
+			a = Mechanize.new
+			a.read_timeout = timeout if timeout
+			a.user_agent_alias= 'Mac Safari'
+			a   
+		end
 
-		#Format results from TVDB
-		#return a hash with the parts we store in the database.
-		def formatTvdbResults( tvdbResults )
-			raise "formatTvdbResults() is not supposed to deal with nil results, sort that out first." if tvdbResults.nil?
-			results=[]
-			tvdbResults['Series'].each_index {|i| tvdbResults['Series'][i].each_key {|item|
-			  results[i]||={}
-				results[i]['tvdbSeriesID'] = \
-					tvdbResults['Series'][i][item] if item=='id'
-				results[i]['imdbID'] = \
-					tvdbResults['Series'][i][item] if item=='IMDB_ID'
-				results[i]['Title'] = \
-					tvdbResults['Series'][i][item] if item=='SeriesName'
-			}}
-			results.each_index {|i|
-				results[i]['EpisodeList']= getAllEpisodes(results[i]['tvdbSeriesID'])
+      #get rid of some wierd stuff
+		def formatInside( inside )
+			inside = inside[0] if inside.is_a?(Array) && inside.length==1
+			inside.each{|k,v|
+				v = v[0] if v.is_a?(Array) && v.length==1
+    			v = v.split("|") if v.is_a?(String) && v.count("|") > 1
+				v.delete("") if v.is_a?(Array)
+				v = nil if v == {}
+         	inside[k] = v
 			}
-
-			results
+			inside
 		end
 
 		def getAllEpisodes( seriesID, since = nil )
@@ -98,19 +90,20 @@ module Thetvdb
 
     #Search Thetvdb.com for str
     def search str, retries=2
-      begin
-        url="http://thetvdb.com/api/GetSeries.php?seriesname=#{ERB::Util.url_encode str}"
-        xml_get(url)
-      rescue Errno::ETIMEDOUT => e
-        (retries-=1 and retry) unless retries<=0
-        raise e
-      rescue Timeout::Error => e
-        (retries-=1 and retry) unless retries<=0
-        raise e
-      rescue REXML::ParseException => e
-        #return empty and continue normally, response from Thetvdb is malformed.
-        return []
-      end
+		begin
+			str = ERB::Util.url_encode str 
+			url="http://thetvdb.com/api/GetSeries.php?seriesname=#{str}"
+			xml_get(url)
+		rescue Errno::ETIMEDOUT => e
+			(retries-=1 and retry) unless retries<=0
+			raise e
+		rescue Timeout::Error => e
+			(retries-=1 and retry) unless retries<=0
+			raise e
+		rescue REXML::ParseException => e
+			#return empty and continue normally, response from Thetvdb is malformed.
+			return []
+		end
     end
 
 	 #this is pretty hacky for now, will fix eventually
@@ -120,6 +113,19 @@ module Thetvdb
 
 		return ids
     end
+
+	 def getFullSeriesRecord(seriesID)
+		url = "http://thetvdb.com/api/#{@apikey}/series/#{seriesID}/all/en.xml"
+		full_record = xml_get(url)
+		
+      full_record["Series"] = formatInside(full_record["Series"]) 
+
+      full_record["Episode"].each{|episode|
+			episode = formatInside(episode)
+		}
+
+		full_record
+	 end        
 
 	 def infoForSeriesId(seriesID)
 		url = "http://thetvdb.com/api/#{@apikey}/series/#{seriesID}/en.xml"
