@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{libthetvdb}
-  s.version = "0.5.1"
+  s.version = "0.6.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Alan"]
-  s.date = %q{2011-03-07}
+  s.date = %q{2011-03-10}
   s.description = %q{This gem is used to access libthetvdb}
   s.email = %q{anochens@andrew.cmu.edu}
   s.extra_rdoc_files = [
@@ -29,6 +29,7 @@ Gem::Specification.new do |s|
     "lib/libthetvdb.rb",
     "lib/updates_all.txt",
     "libthetvdb.gemspec",
+    "output",
     "test.rb",
     "test/helper.rb",
     "test/test_libthetvdb.rb"
