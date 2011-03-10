@@ -61,9 +61,9 @@ module Thetvdb
 
 			episodeList=[]
 
-			#if since is specified, we should use the updates url instead, but more later on that
+			#if since is specified, we should use the updates url instead,
+			#but more later on that
 
-			#TheTVDB runs slowly sometimes, dont want to crash fail, retry instead
 			url = "http://thetvdb.com/api/#{@apikey}/series/#{seriesID}/all/en.xml"
 			body = xml_get(url)
 
@@ -72,6 +72,7 @@ module Thetvdb
 				return []
 			end
 
+			body['Episode'] ||= []
 			body['Episode'].map! {|episode| formatInside(episode) }
 			body['Episode'] 
 		end
@@ -86,7 +87,7 @@ module Thetvdb
 	 #this is pretty hacky for now, will fix eventually
     def getAllSeriesIds
       #read from the local file to save server loads
-		ids = IO.readlines( File.dirname(__FILE__) + "/updates_all.txt" ).map{|l| l.gsub("\n","") }
+		ids = IO.readlines( File.dirname(__FILE__) + "/updates_all.txt" ).map{|l| l.chomp }
 
 		return ids
     end
@@ -96,6 +97,8 @@ module Thetvdb
 		full_record = xml_get(url)
 		
       full_record["Series"] = formatInside(full_record["Series"]) 
+
+		fill_record["Episode"] ||= [] #deal with having no episodes
       full_record["Episode"].map!{|episode| formatInside(episode) }
 			
 		full_record
