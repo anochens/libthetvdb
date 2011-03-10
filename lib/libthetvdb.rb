@@ -21,24 +21,9 @@ require 'mechanize'
 require 'xmlsimple'
 require 'erb'
 
-
 module Thetvdb
 
   class << self
-
-    #readFile takes a filename, and optionally the maximum num of lines to read
-    #returns the lines read as an array.
-    def readFile file, max_lines=0
-      counter=0
-      read_lines=[]
-      File.open(file, 'r') {|f|
-        while (line= f.gets and counter<=max_lines)
-          read_lines << line
-          counter+=1 unless max_lines==0
-        end
-      }
-      read_lines
-    end
 
     def agent(timeout=300)
        a = Mechanize.new
@@ -47,31 +32,7 @@ module Thetvdb
        a   
     end
 
-    def initMirror
-      mirrors_xml = XmlSimple.xml_in agent.get("http://www.thetvdb.com/api/#{@apikey}/mirrors.xml").body
-      mirrors_xml['Mirror'][0]['mirrorpath'][0]
-    end
-  
-    def mirror
-      @mirror
-    end
-
-    def start
-      if @apikey.nil?
-         begin
-           @apikey= File.exist?(File.dirname(__FILE__)+'/apikey.txt') ? readFile(File.dirname(__FILE__) +'/apikey.txt', 1).first.strip : 
-             readFile(File.dirname(__FILE__)+'/../apikey.txt').first.strip
-         rescue Errno::ENOENT => e
-           if e.to_s[/No such file.+apikey\.txt/]
-             puts "Get an apikey please"
-             raise e
-           end
-         end
-      end   
-      @mirror=initMirror
-    end
     attr_accessor :apikey
-    attr_reader :mirror
 
 		#Format results from TVDB
 		#return a hash with the parts we store in the database.
@@ -96,12 +57,14 @@ module Thetvdb
 
 		def getAllEpisodes( seriesID, since = nil )
 			raise "getAllEpisodes() only takes seriesID" if seriesID.class==Fixnum
-         start if mirror.nil?
 
 			episodeList=[]
 
+			#if since is specified, we should use the updates url instead, but more later on that
+
 			#TheTVDB runs slowly sometimes, dont want to crash fail, retry instead
-			body = XmlSimple.xml_in( agent.get("http://thetvdb.com/api/#{@apikey}/series/#{seriesID}/all/en.xml").body )
+			url = "http://thetvdb.com/api/#{@apikey}/series/#{seriesID}/all/en.xml"
+			body = xml_get(url)
 
 			unless body.has_key?('Episode')
 				puts "#{seriesID} has no episodes?"
@@ -114,30 +77,20 @@ module Thetvdb
             #skip episodes without names
             next if episode['EpisodeName'][0] == ''
 
-            sincedate = Chronic.parse(since)
-            airdate   = Chronic.parse(episode['FirstAired'][0])    
-            next if airdate.nil?
+				#episode has more info if we want it, but this seems good
+				episodeList << {
+						  "SeasonNumber" => episode['SeasonNumber'][0],
+						  "SeasonID" => episode['seasonid'][0],
 
-            # sincedate.nil?  means no date was passed, so show all
-            # airdate.nil? means a really new episode with no air adte
-            # since < air means it is in the target range 
-            if sincedate.nil? ||  sincedate <= airdate 
+						  "episode_number" => episode['EpisodeNumber'][0],
+						  "name" => episode['EpisodeName'][0],
 
-               #episode has more info if we want it, but this seems good
-               episodeList << {
-                       "SeasonNumber" => episode['SeasonNumber'][0],
-                       "SeasonID" => episode['seasonid'][0],
+						  "air_date" => episode['FirstAired'][0],
+						  "description" => episode['Overview'][0],
 
-                       "episode_number" => episode['EpisodeNumber'][0],
-                       "name" => episode['EpisodeName'][0],
-
-                       "air_date" => episode['FirstAired'][0],
-                       "description" => episode['Overview'][0],
-
-                       "image_location" => episode['filename'][0],
-                       "imdb_id" => episode['IMDB_ID'][0],
-               }
-            end
+						  "image_location" => episode['filename'][0],
+						  "imdb_id" => episode['IMDB_ID'][0],
+				}
 			}
 
 			episodeList 
@@ -145,10 +98,9 @@ module Thetvdb
 
     #Search Thetvdb.com for str
     def search str, retries=2
-      start if mirror.nil?
       begin
-        url="#{@mirror}/api/GetSeries.php?seriesname=#{ERB::Util.url_encode str}"
-        XmlSimple.xml_in( agent.get("#{@mirror}/api/GetSeries.php?seriesname=#{ERB::Util.url_encode str}").body )
+        url="http://thetvdb.com/api/GetSeries.php?seriesname=#{ERB::Util.url_encode str}"
+        xml_get(url)
       rescue Errno::ETIMEDOUT => e
         (retries-=1 and retry) unless retries<=0
         raise e
@@ -161,9 +113,8 @@ module Thetvdb
       end
     end
 
+	 #this is pretty hacky for now, will fix eventually
     def getAllSeriesIds
-		start if mirror.nil?
-
       #read from the local file to save server loads
 		ids = IO.readlines( File.dirname(__FILE__) + "/updates_all.txt" ).map{|l| l.gsub("\n","") }
 
@@ -171,18 +122,22 @@ module Thetvdb
     end
 
 	 def infoForSeriesId(seriesID)
-	   start if mirror.nil?
+		url = "http://thetvdb.com/api/#{@apikey}/series/#{seriesID}/en.xml"
+		body = xml_get(url)
+		body = body["Series"][0]
+		body.each{|k,v| body[k] = v[0]}
 
-		begin 
-			body = XmlSimple.xml_in( agent.get("http://thetvdb.com/api/#{@apikey}/series/#{seriesID}/en.xml").body )
+		body
+	 end
 
-			body = body["Series"][0]
-			body.each{|k,v| body[k] = v[0]}
-
+	 def xml_get(url)
+		begin
+			body = XmlSimple.xml_in( agent.get(url).body )
 		rescue Mechanize::ResponseCodeError
          body = nil
-		end
-		body
+			raise
+      end
+      body
 	 end
   end
 end

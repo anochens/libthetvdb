@@ -2,7 +2,8 @@
 
 require 'lib/libthetvdb.rb'
 
-#pp it=Thetvdb.search("scrubs")
+Thetvdb.apikey=`cat ./apikey.txt`.chomp
+pp it=Thetvdb.search("scrubs")
 #pp Thetvdb.getAllEpisodes("75760","two weeks ago")
 #pp Thetvdb.getAllSeriesIds()
-pp Thetvdb.infoForSeriesId("75760")
+#pp Thetvdb.infoForSeriesId("75760")
