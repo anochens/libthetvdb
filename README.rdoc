@@ -7,6 +7,7 @@ Thetvdb.apikey="MY_API_KEY_HERE"
 
 
 
+
 To turn on pretty format (will make much slower, but better formatted)
 
 # makes ["EpisodeName"] just "EpisodeName"
@@ -17,9 +18,11 @@ Thetvdb.pretty_format = true
 
 
 
+
 To get all  series info and all episode info, use this, it has the same result as infoForSeriesId() followed by getAllEpisodes() , but it is better to use this instead, because it is more efficient.
 
 pp Thetvdb.getFullSeriesRecord("75760")
+
 
 
 
@@ -29,9 +32,11 @@ pp Thetvdb.getAllEpisodes("75760")
 
 
 
+
 To get all of the series id's as an array, use:
 
 pp Thetvdb.getAllSeriesIds()
+
 
 
 
@@ -41,24 +46,39 @@ pp Thetvdb.search("scrubs")
 
 
 
+
 To get just the series information for a given show, use:
 
 pp Thetvdb.infoForSeriesId("75760")  
 
 
 
+
 This is the libthetvdb library.  It provides
+
 a ruby interface to the TheTvdb.com API.
+
 http://thetvdb.com/
+
 This library is in early beta.
+
 For more information, see;
+
 http://jeffwelling.github.com/libthetvdb
 
+
+
+
 Written by Jeff Welling.
+
 Published as GPLv3 Free Software.
+
 Copyright 2009 Jeff Welling
+
 This program is distributable under the terms of
+
 the GPL Version 3.0.
+
 See COPYING. 
 
 == Contributing to libthetvdb
