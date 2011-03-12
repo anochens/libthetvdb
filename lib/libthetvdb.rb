@@ -26,26 +26,37 @@ module Thetvdb
 	class << self
 
 		attr_accessor :apikey
+		attr_accessor :pretty_format
 
 		def agent(timeout=300)
+			pretty_format ||= false
 			a = Mechanize.new
 			a.read_timeout = timeout if timeout
 			a.user_agent_alias= 'Mac Safari'
 			a   
 		end
 
+		# get rid of the common ["something here"], where array isn't needed
+		# break arrays in "|elem1|elem2|" format into a real array
+		def break_array(str)
+			v = str
+
+			v = v[0] if v.is_a?(Array) && v.length==1
+
+			#turn lists with seperators into arrays
+			v = v.split("|") if v.is_a?(String) && v.count("|") > 1
+
+			#get rid of empty elements from the array
+			v.delete("") if v.is_a?(Array)
+
+			v
+		end	
+
       #get rid of some wierd stuff
 		def formatInside( inside )
 			inside = inside[0] if inside.is_a?(Array) && inside.length==1
 			inside.each{|k,v|
-				# get rid of the common ["something here"], where array unneeded
-				v = v[0] if v.is_a?(Array) && v.length==1
-
-				#turn lists with seperators into arrays
-    			v = v.split("|") if v.is_a?(String) && v.count("|") > 1
-
-				#get rid of empty elements from the array
-				v.delete("") if v.is_a?(Array)
+				v = Thetvdb.break_array(v)
 
 				#replace {}s with nils; it's more intuitive to test for nil
 				v = nil if v == {}
@@ -73,7 +84,7 @@ module Thetvdb
 			end
 
 			body['Episode'] ||= []
-			body['Episode'].map! {|episode| formatInside(episode) }
+			body['Episode'].map! {|episode| formatInside(episode) } if pretty_format
 			body['Episode'] 
 		end
 
@@ -96,10 +107,10 @@ module Thetvdb
 		url = "http://thetvdb.com/api/#{@apikey}/series/#{seriesID}/all/en.xml"
 		full_record = xml_get(url)
 		
-      full_record["Series"] = formatInside(full_record["Series"]) 
+      full_record["Series"] = formatInside(full_record["Series"]) if pretty_format
 
 		full_record["Episode"] ||= [] #deal with having no episodes
-      full_record["Episode"].map!{|episode| formatInside(episode) }
+      full_record["Episode"].map!{|episode| formatInside(episode) } if pretty_format
 			
 		full_record
 	 end        
@@ -107,7 +118,8 @@ module Thetvdb
 	 def infoForSeriesId(seriesID)
 		url = "http://thetvdb.com/api/#{@apikey}/series/#{seriesID}/en.xml"
 		series = xml_get(url)
-		series = formatInside(series["Series"])
+		series = series["Series"]
+		series = formatInside(series) if pretty_format
 		
 		series
 	 end

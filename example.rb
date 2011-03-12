@@ -6,6 +6,9 @@ require 'lib/libthetvdb.rb'
 #Thetvdb.apikey="MY_API_KEY_HERE"
 Thetvdb.apikey=`cat ./apikey.txt`.chomp
 
+#Turns on pretty format (will make much slower, but better formatted)
+#Thetvdb.pretty_format = true
+
 #get series info and all episode info
 #same result as infoForSeriesId() followed by getAllEpisodes()
 #use this instead, because it is more efficient
