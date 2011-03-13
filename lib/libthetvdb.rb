@@ -49,6 +49,7 @@ module Thetvdb
 			#get rid of empty elements from the array
 			v.delete("") if v.is_a?(Array)
 
+			v = [v] unless v.is_a?(Array)
 			v
 		end	
 
@@ -57,6 +58,7 @@ module Thetvdb
 			inside = inside[0] if inside.is_a?(Array) && inside.length==1
 			inside.each{|k,v|
 				v = Thetvdb.break_array(v)
+				v = v[0] if v.is_a?(Array) && v.length==1
 
 				#replace {}s with nils; it's more intuitive to test for nil
 				v = nil if v == {}
