@@ -92,61 +92,61 @@ module Thetvdb
 			body['Episode'] 
 		end
 
-	#Search Thetvdb.com for str
-	def search(str)
-		str = ERB::Util.url_encode str 
-		url="http://thetvdb.com/api/GetSeries.php?seriesname=#{str}"
-		xml_get(url)
-	end
+		#Search Thetvdb.com for str
+		def search(str)
+			str = ERB::Util.url_encode str 
+			url="http://thetvdb.com/api/GetSeries.php?seriesname=#{str}"
+			xml_get(url)
+		end
 
-	#this is pretty hacky for now, will fix eventually
-	def getAllSeriesIds
-		#read from the local file to save server loads
-		ids = IO.readlines( File.dirname(__FILE__) + "/updates_all.txt" ).map{|l| l.chomp }
+		#this is pretty hacky for now, will fix eventually
+		def getAllSeriesIds
+			#read from the local file to save server loads
+			ids = IO.readlines( File.dirname(__FILE__) + "/updates_all.txt" ).map{|l| l.chomp }
 
-		return ids
-	end
+			return ids
+		end
 
-	 def getFullSeriesRecord(seriesID)
-		url = "http://thetvdb.com/api/#{@apikey}/series/#{seriesID}/all/en.xml"
-		full_record = xml_get(url)
-		
-		full_record["Series"] = formatInside(full_record["Series"]) if pretty_format
-
-		full_record["Episode"] ||= [] #deal with having no episodes
-		full_record["Episode"].map!{|episode| formatInside(episode) } if pretty_format
+		 def getFullSeriesRecord(seriesID)
+			url = "http://thetvdb.com/api/#{@apikey}/series/#{seriesID}/all/en.xml"
+			full_record = xml_get(url)
 			
-		full_record
-	 end	
+			full_record["Series"] = formatInside(full_record["Series"]) if pretty_format
 
-	 def infoForSeriesId(seriesID)
-		url = "http://thetvdb.com/api/#{@apikey}/series/#{seriesID}/en.xml"
-		series = xml_get(url)
-		series = series["Series"]
-		series = formatInside(series) if pretty_format
-		
-		series
-	 end
+			full_record["Episode"] ||= [] #deal with having no episodes
+			full_record["Episode"].map!{|episode| formatInside(episode) } if pretty_format
+				
+			full_record
+		 end	
 
-	 def xml_get(url, retries = 3)
-		begin
-			body = XmlSimple.xml_in( agent.get(url).body )
-		rescue Mechanize::ResponseCodeError
-			body = nil
-			raise
-		rescue Errno::ETIMEDOUT => e
-			(retries-=1 and retry) if retries > 0
-			raise e
-		rescue Timeout::Error => e
-			(retries-=1 and retry) if retries > 0
-			raise e
-		rescue REXML::ParseException => e
-			#return empty and continue normally, 
-			#response from Thetvdb is malformed.
+		 def infoForSeriesId(seriesID)
+			url = "http://thetvdb.com/api/#{@apikey}/series/#{seriesID}/en.xml"
+			series = xml_get(url)
+			series = series["Series"]
+			series = formatInside(series) if pretty_format
+			
+			series
+		 end
 
-			return []
-		end	
-		body
-	 end
+		 def xml_get(url, retries = 3)
+			begin
+				body = XmlSimple.xml_in( agent.get(url).body )
+			rescue Mechanize::ResponseCodeError
+				body = nil
+				raise
+			rescue Errno::ETIMEDOUT => e
+				(retries-=1 and retry) if retries > 0
+				raise e
+			rescue Timeout::Error => e
+				(retries-=1 and retry) if retries > 0
+				raise e
+			rescue REXML::ParseException => e
+				#return empty and continue normally, 
+				#response from Thetvdb is malformed.
+
+				return []
+			end	
+			body
+		 end
 	end
 end
