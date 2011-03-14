@@ -46,6 +46,7 @@ module Thetvdb
 
 			#return [] instead of a nil
 			arr ||= []
+			arr = [arr] unless arr.is_a?(Array)
 
 			arr
 		end	
@@ -129,7 +130,9 @@ module Thetvdb
 			series
 		 end
 
-		 private #from here on, things are private
+		 # from here on, things are private
+
+		 private 
 
 		 def xml_get(url, retries = 3)
 			begin
