@@ -1,57 +1,57 @@
 = Basic Usage
 
 
-To set the apikey use:
-
+==To set the apikey use:
+<tt>
 Thetvdb.apikey="MY_API_KEY_HERE"
+</tt>
 
 
+==To turn on pretty format (will make much slower, but better formatted)
+===This turns ["EpisodeName"] into "EpisodeName" and ["|actor1|actor2|" into ["actor1","actor2"]
 
-
-To turn on pretty format (will make much slower, but better formatted)
-
-# makes ["EpisodeName"] just "EpisodeName"
-
-# makes ["|actor1|actor2|" into ["actor1","actor2"]
-
+<tt>
 Thetvdb.pretty_format = true
+<tt>
 
 
-
-
-To get all  series info and all episode info, use this, it has the same result as infoForSeriesId() followed by getAllEpisodes() , but it is better to use this instead, because it is more efficient.
+==To get all series info and all episode info
+===Use this, it has the same result as infoForSeriesId() followed by getAllEpisodes() , but it is better to use this instead, because it is more efficient.
+<tt>
 
 pp Thetvdb.getFullSeriesRecord("75760")
+<tt>
 
 
 
 
-Use this to get all episodes for a given series, by a series' id
+==Use this to get all episodes for a given series, by a series' id
 
+<tt>
 pp Thetvdb.getAllEpisodes("75760")
+</tt>
 
 
+==To get all of the series id's as an array, use:
 
-
-To get all of the series id's as an array, use:
-
+<tt>
 pp Thetvdb.getAllSeriesIds()
+</tt>
 
 
+==To search for shows by name use this. 
+===Keep in mind that multiple things are returned
 
-
-To search for shows by name use this. Keep in mind that multiple things are returned
-
+<tt>
 pp Thetvdb.search("scrubs")
+</tt>
 
 
+==To get just the series information for a given show, use:
 
-
-To get just the series information for a given show, use:
-
+<tt>
 pp Thetvdb.infoForSeriesId("75760")  
-
-
+</tt>
 
 
 This is the libthetvdb library.  It provides

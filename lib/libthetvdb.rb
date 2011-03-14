@@ -36,23 +36,24 @@ module Thetvdb
 			a
 		end
 
-		# get rid of the common ["something here"], where array isn't needed
 		# break arrays in "|elem1|elem2|" format into a real array
-		def break_array(v)
+		def break_array(arr)
 			#turn lists with seperators into arrays
-			v = v.split("|") if v.is_a?(String) && v.count("|") > 1
+			arr = arr.split("|") if arr.is_a?(String) && arr.count("|") > 1
 
 			#get rid of empty elements from the array
-			v.delete("") if v.is_a?(Array)
+			arr.delete("") if arr.is_a?(Array)
 
-			v ||= []
-			v
+			#return [] instead of a nil
+			arr ||= []
+
+			arr
 		end	
 
 		#extracts the element from an array of length 1
-		def extractElemFromArray(a)
-			return a[0] if a.is_a?(Array) && a.length == 1
-			a
+		def extractElemFromArray(arr)
+			return arr[0] if arr.is_a?(Array) && arr.length == 1
+			arr
 		end	
 
 		#get rid of some wierd stuff
@@ -71,7 +72,7 @@ module Thetvdb
 			inside
 		end
 
-		def getAllEpisodes( seriesID, since = nil )
+		def getAllEpisodes( seriesID )
 			raise "getAllEpisodes() only takes seriesID" if seriesID.class==Fixnum
 
 			episodeList=[]
@@ -127,6 +128,8 @@ module Thetvdb
 			
 			series
 		 end
+
+		 private #from here on, things are private
 
 		 def xml_get(url, retries = 3)
 			begin
