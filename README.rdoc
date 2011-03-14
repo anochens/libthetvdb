@@ -7,16 +7,16 @@ Thetvdb.apikey="MY_API_KEY_HERE"
 </tt>
 
 
-===To turn on pretty format (will make much slower, but better formatted)
-This turns ["EpisodeName"] into "EpisodeName" and ["|actor1|actor2|" into ["actor1","actor2"]
+===To turn on pretty format (slower, but better formatted):
+Note: This turns ["EpisodeName"] into "EpisodeName" and ["|actor1|actor2|" into ["actor1","actor2"]
 
 <tt>
 Thetvdb.pretty_format = true
 </tt>
 
 
-===To get all series info and all episode info
-Use this, it has the same result as infoForSeriesId() followed by getAllEpisodes() , but it is better to use this instead, because it is more efficient.
+===To get all series info and all episode info:
+Note: This has the same result as infoForSeriesId() followed by getAllEpisodes() , but it is better to use this, because it is more efficient.
 
 <tt>
 pp Thetvdb.getFullSeriesRecord("75760")
@@ -39,8 +39,7 @@ pp Thetvdb.getAllSeriesIds()
 </tt>
 
 
-===To search for shows by name use this. 
-Keep in mind that multiple series are returned
+===To search for shows by name use this (multiple shows returned):
 
 <tt>
 pp Thetvdb.search("scrubs")
