@@ -28,7 +28,7 @@ module Thetvdb
 		attr_accessor :apikey
 		attr_accessor :pretty_format
 
-		def agent(timeout=300)
+		def agent(timeout=5000)
 			pretty_format ||= false
 			a = Mechanize.new
 			a.read_timeout = timeout if timeout
@@ -140,6 +140,9 @@ module Thetvdb
 			rescue Mechanize::ResponseCodeError
 				body = nil
 				raise
+			rescue Timeout::Error 
+				(retries-=1 and retry) if retries > 0
+				raise e
 			rescue Errno::ETIMEDOUT => e
 				(retries-=1 and retry) if retries > 0
 				raise e
