@@ -134,7 +134,7 @@ module Thetvdb
 
 		 private 
 
-		 def xml_get(url, retries = 3)
+		 def xml_get(url, retries = 300)
 			begin
 				body = XmlSimple.xml_in( agent.get(url).body )
 			rescue Mechanize::ResponseCodeError

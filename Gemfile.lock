@@ -1,7 +1,6 @@
 GEM
   remote: http://rubygems.org/
   specs:
-    chronic (0.3.0)
     git (1.2.5)
     jeweler (1.5.2)
       bundler (~> 1.0.0)
@@ -20,7 +19,6 @@ PLATFORMS
 
 DEPENDENCIES
   bundler (~> 1.0.0)
-  chronic
   jeweler (~> 1.5.2)
   mechanize
   rcov
